@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import sys
 from pathlib import Path
 
 import pytest
@@ -161,6 +162,11 @@ def test_jev_preflight_does_not_print_or_store_credentials(
 ) -> None:
     monkeypatch.delenv("TYPESAFE_API_KEY", raising=False)
     monkeypatch.delenv("TEXT_MODEL_API_KEY", raising=False)
+    expected_error = (
+        "TYPESAFE_API_KEY"
+        if sys.version_info >= (3, 12)
+        else "Python 3.12"
+    )
 
-    with pytest.raises(JevUnavailable, match="TYPESAFE_API_KEY"):
+    with pytest.raises(JevUnavailable, match=expected_error):
         _load_jev_agent(text_model_required=True)
