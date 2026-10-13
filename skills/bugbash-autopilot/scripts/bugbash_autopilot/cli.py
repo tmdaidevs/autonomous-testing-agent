@@ -16,6 +16,7 @@ from .evidence import (
     parse_rectangle,
     record_upload,
 )
+from .jev_adapter import run_jev_goal
 from .planning import write_plan
 from .reporting import generate_report
 from .validation import validate_run
@@ -133,6 +134,46 @@ def _build_parser() -> argparse.ArgumentParser:
     lookup_parser.add_argument("--run-dir", required=True, type=_run_dir)
     lookup_parser.add_argument("--id", required=True)
 
+    jev_parser = subparsers.add_parser(
+        "jev-run",
+        help="Run a narrow goal with the optional jev-ultrafast backend.",
+    )
+    jev_parser.add_argument("--run-dir", required=True, type=_run_dir)
+    jev_parser.add_argument("--case-id", required=True)
+    jev_parser.add_argument("--finding-id")
+    jev_parser.add_argument("--url", required=True)
+    jev_parser.add_argument("--goal", required=True)
+    jev_parser.add_argument("--description")
+    jev_parser.add_argument("--expected-url-regex")
+    jev_parser.add_argument(
+        "--expected-text",
+        action="append",
+        default=[],
+        help="Visible text required in the final state; may be repeated.",
+    )
+    jev_parser.add_argument(
+        "--redact",
+        action="append",
+        default=[],
+        metavar="X,Y,WIDTH,HEIGHT",
+    )
+    jev_parser.add_argument(
+        "--highlight",
+        action="append",
+        default=[],
+        metavar="X,Y,WIDTH,HEIGHT",
+    )
+    jev_parser.add_argument(
+        "--click-only",
+        action="store_true",
+        help="Do not require TEXT_MODEL_API_KEY; use only for goals that never type.",
+    )
+    jev_parser.add_argument(
+        "--no-register-evidence",
+        action="store_true",
+        help="Keep Jev frames and trace without adding the final frame to the manifest.",
+    )
+
     return parser
 
 
@@ -221,6 +262,33 @@ def _execute(arguments: argparse.Namespace) -> int:
         matches = lookup_evidence(arguments.run_dir, arguments.id)
         print(json.dumps(matches, indent=2))
         return 0 if matches else 1
+
+    if arguments.command == "jev-run":
+        result = run_jev_goal(
+            run_dir=arguments.run_dir,
+            test_case_id=arguments.case_id,
+            finding_id=arguments.finding_id,
+            url=arguments.url,
+            goal=arguments.goal,
+            description=arguments.description,
+            expected_url_regex=arguments.expected_url_regex,
+            expected_text=arguments.expected_text,
+            redactions=[
+                parse_rectangle(value) for value in arguments.redact
+            ],
+            highlights=[
+                parse_rectangle(value) for value in arguments.highlight
+            ],
+            register_evidence=not arguments.no_register_evidence,
+            text_model_required=not arguments.click_only,
+        )
+        print(json.dumps(result, indent=2))
+        if (
+            not result["verification"]["verified"]
+            and not result["verification"]["requires_manual"]
+        ):
+            return 1
+        return 0
 
     raise ValueError(f"Unsupported command: {arguments.command}")
 

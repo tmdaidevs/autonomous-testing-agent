@@ -367,6 +367,78 @@ def validate_run(run_dir: Path) -> ValidationReport:
                     "unknown-dependency",
                     f"Test case {case_id} depends on {dependency!r}",
                 )
+        attempts = test_case.get("attempts", [])
+        if not isinstance(attempts, list):
+            report.error(
+                "invalid-attempts",
+                f"Test case {case_id} attempts must be an array",
+            )
+            attempts = []
+        for attempt_number, attempt in enumerate(attempts, start=1):
+            if not isinstance(attempt, dict):
+                report.error(
+                    "invalid-attempt",
+                    f"Test case {case_id} attempt {attempt_number} must be an object",
+                )
+                continue
+            if attempt.get("adapter") != "jev-ultrafast":
+                continue
+            trace_relative = attempt.get("trace_path")
+            if not isinstance(trace_relative, str) or not trace_relative:
+                report.error(
+                    "missing-jev-trace",
+                    f"Test case {case_id} Jev attempt has no trace_path",
+                )
+                continue
+            try:
+                trace_path = resolve_run_path(run_dir, trace_relative)
+            except ValueError as error:
+                report.error("unsafe-path", str(error))
+                continue
+            if not trace_path.is_file():
+                report.error(
+                    "missing-jev-trace",
+                    f"Test case {case_id} Jev trace does not exist: "
+                    f"{trace_relative}",
+                )
+                continue
+            trace = read_json(trace_path)
+            if trace.get("test_case_id") != case_id:
+                report.error(
+                    "jev-trace-mismatch",
+                    f"Jev trace {trace_relative} belongs to "
+                    f"{trace.get('test_case_id')!r}, not {case_id!r}",
+                )
+            goal_hash = trace.get("goal_sha256")
+            if not isinstance(goal_hash, str) or not re.fullmatch(
+                r"[a-f0-9]{64}", goal_hash
+            ):
+                report.error(
+                    "invalid-jev-goal-hash",
+                    f"Jev trace {trace_relative} has no valid goal hash",
+                )
+            trace_evidence_id = trace.get("evidence_id")
+            if (
+                trace_evidence_id is not None
+                and trace_evidence_id not in evidence_ids
+            ):
+                report.error(
+                    "unknown-evidence",
+                    f"Jev trace {trace_relative} references "
+                    f"{trace_evidence_id!r}",
+                )
+            for history_item in trace.get("history", []):
+                if not isinstance(history_item, dict):
+                    continue
+                forbidden = {"text", "usage", "goal", "page"} & set(
+                    history_item
+                )
+                if forbidden:
+                    report.error(
+                        "sensitive-jev-trace",
+                        f"Jev trace {trace_relative} contains forbidden "
+                        f"history fields: {', '.join(sorted(forbidden))}",
+                    )
         if (
             status in {"issue", "works_with_issue"}
             and not case_evidence

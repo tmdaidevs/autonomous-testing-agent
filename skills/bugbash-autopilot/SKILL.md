@@ -17,6 +17,7 @@ Read the supporting references when their phase becomes relevant:
 - [Safety and privacy](references/safety.md)
 - [Intake adapters](references/intake-adapters.md)
 - [Run state](references/run-state.md)
+- [Jev Ultrafast adapter](references/jev-ultrafast.md)
 
 ## Non-negotiable rules
 
@@ -124,6 +125,27 @@ For each ready test case:
 Serialize operations that touch the same mutable parent resource. Independent
 resources may be tested in parallel only when that does not make evidence or
 failure attribution ambiguous.
+
+#### Optional fast browser execution
+
+Use the Jev Ultrafast adapter for narrow, non-destructive goals involving
+ordinary visible DOM or ARIA controls:
+
+```shell
+bugbash-autopilot jev-run \
+  --run-dir runs/<run-id> \
+  --case-id <check-id> \
+  --url <start-url> \
+  --goal "<narrow goal>" \
+  --expected-url-regex "<required URL pattern>" \
+  --expected-text "<required visible text>"
+```
+
+Jev selecting `DONE` is not proof of success. Supply deterministic completion
+predicates or verify the final state independently with computer use. Read
+[jev-ultrafast.md](references/jev-ultrafast.md) before enabling it. Route file
+uploads, frames, shadow DOM, canvas, popup tabs, nested scrolling, media,
+visual checks, console/network inspection, and blocked goals to computer use.
 
 ### 4. Retry and classify
 

@@ -35,6 +35,36 @@ and mapped into an external bug-intake checklist.
 - Record upload failures without falsely claiming that evidence was attached.
 - Locate evidence later from either a local finding ID or external tracking ID.
 
+## Optional Jev Ultrafast fast path
+
+The agent can use
+[`browser-use/jev-ultrafast`](https://github.com/browser-use/jev-ultrafast)
+as an optional execution backend for narrow interactions with ordinary visible
+DOM and ARIA controls.
+
+```shell
+python -m pip install -e ".[jev]"
+
+bugbash-autopilot jev-run \
+  --run-dir runs/my-app \
+  --case-id SEARCH-001 \
+  --url https://example.test/search \
+  --goal "Search for Contoso and stop when matching results are visible." \
+  --expected-text "Contoso"
+```
+
+Jev is the fast navigator, while Bug Bash Autopilot remains the test
+orchestrator and evidence authority. The adapter records Jev frames, writes a
+sanitized trace, registers the final screenshot, and requires deterministic or
+manual verification after Jev selects `DONE`.
+
+The integration is optional because it requires Python 3.12, Browser Harness,
+a TypeSafe API key, and a text-model API key for tasks that type. File uploads,
+iframes, shadow DOM, canvas, pop-up tabs, nested scrolling, media verification,
+visual checks, and diagnostics continue through browser computer use. See
+[the adapter guide](skills/bugbash-autopilot/references/jev-ultrafast.md) for
+privacy and routing rules.
+
 ## Install the skill
 
 With GitHub CLI 2.90 or later:

@@ -23,6 +23,9 @@ produce enough evidence for another person to reproduce and triage the result.
   controlled serial conditions.
 - Capture screenshots while the relevant state is visible.
 - Preserve originals and submit only reviewed, redacted processed copies.
+- Use the optional Jev Ultrafast backend only for narrow, low-risk interactions
+  with ordinary visible controls. Independently verify `DONE`, and switch to
+  computer use for unsupported controls, evidence review, or blocked goals.
 - Document functional failures, confusing UX, missing diagnostics, unsafe
   defaults, accessibility problems, testability limitations, and guide defects.
 - Verify persisted submissions and external tracking IDs.

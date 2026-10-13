@@ -19,3 +19,12 @@ details. Before sharing evidence:
 6. Verify that the processed copy no longer exposes the sensitive value.
 
 The helper tools reduce accidental disclosure but do not replace human review.
+
+## External browser-model providers
+
+The optional Jev Ultrafast adapter sends structured visible-page state to the
+configured TypeSafe service. When text entry is needed, field context is also
+sent to the configured text-model provider. Do not enable this adapter for
+pages whose content is not approved for those providers. API keys must be
+supplied through environment variables and must never be written to run
+artifacts.
