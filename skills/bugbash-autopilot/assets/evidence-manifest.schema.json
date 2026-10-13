@@ -1,0 +1,126 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/tmdaidevs/autonomous-testing-agent/evidence-manifest.schema.json",
+  "title": "Bug Bash Evidence Manifest",
+  "type": "object",
+  "required": ["schema_version", "run_id", "created_at", "policy", "evidence"],
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "run_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "policy": {
+      "type": "object",
+      "required": ["max_attachment_bytes", "preserve_originals"],
+      "properties": {
+        "max_attachment_bytes": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "preserve_originals": {
+          "const": true
+        }
+      }
+    },
+    "evidence": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "evidence_id",
+          "test_case_id",
+          "kind",
+          "path",
+          "original_path",
+          "description",
+          "captured_at",
+          "expected",
+          "actual",
+          "sha256",
+          "original_sha256",
+          "attachment"
+        ],
+        "properties": {
+          "evidence_id": {
+            "type": "string",
+            "pattern": "^EVD-[0-9]{3,}$"
+          },
+          "test_case_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "finding_id": {
+            "type": ["string", "null"]
+          },
+          "kind": {
+            "enum": ["screenshot", "image", "diagram"]
+          },
+          "path": {
+            "type": "string",
+            "minLength": 1
+          },
+          "original_path": {
+            "type": "string",
+            "minLength": 1
+          },
+          "description": {
+            "type": "string",
+            "minLength": 1
+          },
+          "captured_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "page_url": {
+            "type": ["string", "null"]
+          },
+          "action": {
+            "type": ["string", "null"]
+          },
+          "expected": {
+            "type": "string"
+          },
+          "actual": {
+            "type": "string"
+          },
+          "sha256": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "original_sha256": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "attachment": {
+            "type": "object",
+            "required": ["status"],
+            "properties": {
+              "status": {
+                "enum": [
+                  "not_attempted",
+                  "uploaded",
+                  "blocked",
+                  "not_supported",
+                  "rejected"
+                ]
+              },
+              "external_tracking_id": {
+                "type": ["string", "null"]
+              },
+              "failure_reason": {
+                "type": ["string", "null"]
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,46 @@
+{
+  "schema_version": 1,
+  "run_id": "synthetic-webapp-2026-10-13",
+  "created_at": "2026-10-13T07:57:45Z",
+  "policy": {
+    "max_attachment_bytes": 2097152,
+    "preserve_originals": true
+  },
+  "evidence": [
+    {
+      "evidence_id": "EVD-001",
+      "test_case_id": "BROWSE-001",
+      "finding_id": "BUG-001",
+      "kind": "screenshot",
+      "path": "evidence/processed/BROWSE-001/001-BROWSE-001-example-documents-card-displays-undefined-below-the-table-name.png",
+      "original_path": "evidence/originals/BROWSE-001/001-BROWSE-001-example-documents-card-displays-undefined-below-the-table-name.png",
+      "description": "example_documents card displays undefined below the table name",
+      "captured_at": "2026-10-13T07:46:08Z",
+      "page_url": "https://example.test/databases/demo/tables",
+      "action": "Opened the Tables page and inspected the resource card",
+      "expected": "The card displays a meaningful resource type.",
+      "actual": "The card displays undefined.",
+      "sha256": "25f01be0201ab33e7aa9ed5a6371637407285b6056778f670000fda17af6758f",
+      "original_sha256": "bd1e6fdd2da0ef45388c23febfbd7ee55a16140dcbb1a7e253e543bb0f43c143",
+      "image": {
+        "width": 1280,
+        "height": 720,
+        "bytes": 12166
+      },
+      "redactions": [],
+      "highlights": [
+        [
+          280,
+          225,
+          220,
+          50
+        ]
+      ],
+      "attachment": {
+        "status": "uploaded",
+        "external_tracking_id": "DEMO-1234",
+        "failure_reason": null
+      }
+    }
+  ]
+}
